@@ -1,0 +1,35 @@
+Why use F.crossentropy in place of individually writing softmax?
+
+-First understand that -ll and crossentropy in case of classification is same.
+-In poduction F.crossentropy does not create individual operations so memorywise it does not need to store all those grads
+-Imp reason: e^(large num) = inf and this causes NaN error while optimizing and F.crossentropy handles it by subtracting the largest number and then calculating the probability.
+This way all exponents are <= 0 and e^(number<=0) = small positive number
+
+eg: logit = [-5, -3, 0, 100] we did [e-5, e-3, e0, e100]
+F.crossentropy does: [e(-5-100), e(-3-100), e(0-100), e(100-100)] and while calculating prob = e(-5-100)/[e(-5-100), e(-3-100), e(0-100), e(100-100)].sum?(), the answer will be same
+
+
+How to choose a learning rate:
+Ans:
+Choose different learning rates, very low initially and grows exponentially after suppose 1000 epoch(1 fwd + 1 bkd pass)
+plot learning rate on x axis and loss on y, the valley(low point) is the ideal candidate for good learning rate
+
+Train, val, test split:
+
+Train set(80%): Used to train the NN or train the parameters of NN
+Val/dev set(10%): Used by the developer to engineer around the hyperparameter or train the hyperparameter
+Validation(10%) : Used to finally validate the model, used very less so that knowledge from this set does not go into training otherwise we would overfit the model
+
+makemore part 3: 08-01-2026
+
+Why batch normalisation?
+
+All inputs examples(x's) have a distrubution,  and when we do Wx+b, the std increases, this may case tanh or other non linear function like relu to end up the constant part.
+Then the gradient will become zero so this neuron is dead. when we normalize it, we make all the values small so that it does not blow up and end up in a dead neuron.
+
+- Has a regularizing effect
+
+-After batch norm, the NN expects data in batches to calculate batch mean and std. But durin inference, we send only one data point. To tackle that we calculate the mean and std. dev of entire training data and use it for inference
+
+Summary - 
+In essence Batchnorm was one of the first innovations that helped stabilize very deep neural networks
